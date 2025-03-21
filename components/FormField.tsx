@@ -34,8 +34,8 @@ const FormField = ({
           <Input
             className="input"
             placeholder={placeholder}
-            {...field}
             type={type}
+            {...field}
           />
         </FormControl>
         <FormMessage />
