@@ -1,17 +1,28 @@
-import React from "react";
-import { getInterviewsById } from "@/lib/actions/general.action";
-import { redirect } from "next/navigation";
-import { getRandomInterviewCover } from "@/lib/utils";
 import Image from "next/image";
-import DisplayTechIcons from "@/components/DisplayTechIcons";
-import Agent from "@/components/Agent";
-import { getCurrentUser } from "@/lib/actions/auth.action";
-const Page = async ({ params }: RouteParams) => {
-  const { id } = params;
-  const user = await getCurrentUser();
-  const interview = await getInterviewsById(id);
+import { redirect } from "next/navigation";
 
+import Agent from "@/components/Agent";
+import { getRandomInterviewCover } from "@/lib/utils";
+
+import {
+  getFeedbackByInterviewId,
+  getInterviewById,
+} from "@/lib/actions/general.action";
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import DisplayTechIcons from "@/components/DisplayTechIcons";
+
+const InterviewDetails = async ({ params }: RouteParams) => {
+  const { id } = await params;
+
+  const user = await getCurrentUser();
+
+  const interview = await getInterviewById(id);
   if (!interview) redirect("/");
+
+  const feedback = await getFeedbackByInterviewId({
+    interviewId: id,
+    userId: user?.id!,
+  });
 
   return (
     <>
@@ -37,14 +48,15 @@ const Page = async ({ params }: RouteParams) => {
       </div>
 
       <Agent
-        userName={user?.name || ""}
+        userName={user?.name!}
         userId={user?.id}
         interviewId={id}
         type="interview"
         questions={interview.questions}
+        feedbackId={feedback?.id}
       />
     </>
   );
 };
 
-export default Page;
+export default InterviewDetails;
